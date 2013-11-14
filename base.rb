@@ -8,5 +8,9 @@ ActiveRecord::Base.establish_connection(:adapter =>"postgresql",
 
 class Template < ActiveRecord::Base
 end
+class Data < ActiveRecord::Base
+end
+class Group < ActiveRecord::Base
+end
 c = Template.find(1)
 p c
