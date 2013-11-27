@@ -1,0 +1,13 @@
+
+require 'rubygems'
+class DbConnect
+require 'mysql2'
+  def initialize(hostname, username, password, dbname)
+    @hostname= hostname
+    @username= username
+    @password= password
+    @dbname= dbname
+    @dbc= Mysql.connect(hostname, username, password, dbname)
+  end
+
+end
