@@ -75,7 +75,7 @@ class Main
 	end
  	def zyxel(ip,pass)
  		#ready module, to autorisation on zyxel switch
- 		driver = Selenium::WebDriver.for :firefox
+ 		driver = Selenium::WebDriver.for :chrome
 		driver.get "http://admin:#{pass}@#{ip}/"
 		initialize
 	end
