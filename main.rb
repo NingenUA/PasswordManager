@@ -1,10 +1,14 @@
-require_relative "db_connect"
+require_relative 'db_connect'
+require "selenium-webdriver"
+
+
 class Main 
 
 	def initialize
 		#inp = 1
 		#until inp == 99
-			puts "\e[H\e[2J"
+			system('cls')
+			#puts "\e[H\e[2J"
 			puts "Choose action "
 			puts "1) add new pass"
 			puts "2) show pass"
@@ -16,7 +20,7 @@ class Main
 			elsif inp == "2\n"
 				show_pass
 			elsif inp == "3\n"
-				modify_pass
+				edit_pass
 			else
 				print "try again"
 			end	
@@ -25,6 +29,7 @@ class Main
 		#end	
 	end	
  	def add_pass
+ 		system('cls')
  		print "Enter Title:  "
  		title = gets 
  		print "Enter user:  "
@@ -52,12 +57,33 @@ class Main
  		 end	
  	end
  	def modify_pass
- 	
+ 		system('cls') 		
  	end	
  	def open_link
- 	
- 	end
+ 		system('cls') 	
+ 		x = 1
+ 		
+ 		#zte("172.17.4.118","KgVT8g49")
+ 		#zyxel
+	end
+	def zte(ip,pass)
+		f = File.new("tmp/#{ip}.lua","w")
+		f.puts ('lua_senddata("admin",true);lua_senddata('"#{pass}"',true);lua_start_trace();while true do res,value = lua_getdata();if string.match(value,">") then lua_reset_trace();lua_senddata("en",true);lua_senddata('"#{pass}"',true);break;end end')
+		f.close
+		system('putty.exe -telnet '"#{ip}"' -runlua text.txt')
+
+	end
+ 	def zyxel(ip,pass)
+ 		#ready module, to autorisation on zyxel switch
+ 		driver = Selenium::WebDriver.for :firefox
+		driver.get "http://admin:#{pass}@#{ip}/"
+		initialize
+	end
  	def show_pass
+ 		system('cls')
+ 		puts "Enter id:  "
+ 		id = gets
+ 		p Info.find(id)
  	end
 
 end
