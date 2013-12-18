@@ -113,7 +113,7 @@ class Main
  		elsif inp == "5\n"
 		  system('cls')
 		  p dev["link"]
-		  print "Enter new Link: "
+		  print "Enter new IP: "
 		  inp = gets
 		  dev["link"]=inp.strip
 		  if dev.save
