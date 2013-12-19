@@ -15,3 +15,5 @@ add crypto on password
 Group -> it's for some order for example, there I record the city
 
 Template -> it's give to know how to open this model of switch 
+
+add migrations. template and group table need to bee fell up manualy and 
