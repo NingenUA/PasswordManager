@@ -1,12 +1,25 @@
-require_relative 'db_connect'
+
 require "selenium-webdriver"
+
 
 
 class Main 
 
 	def initialize
-
+			#$secret = ""
 			system('cls')
+			puts
+			puts "Hello"
+			puts "Enter Password"
+			$secret = gets
+			$secret.strip!
+
+			require_relative 'db_connect'
+			main_menu
+		
+	end	
+	def main_menu
+		system('cls')
 			#puts "\e[H\e[2J"
 			puts "Choose action "
 			puts "1) add new pass"
@@ -23,19 +36,19 @@ class Main
 				
 			else
 				print "try again"
-				initialize
+				main_menu
 			end	
-
 	end	
 	
  	def add_pass
  		system('cls')
  		print "Enter Title:  "
- 		title = gets 
+ 		title = gets.downcase 
  		print "Enter user:  "
  		user = gets 
  		print "Enter Password:  "
- 		pass = gets 
+ 		pass = gets
+ 		#pass =  Encryptor.encrypt(:value => pass.strip, :key => @secret)
  		print "Enter Note:  "
  		note = gets 
  		print "Enter Link:  "
@@ -55,14 +68,21 @@ class Main
  		 if new.save
  		 	p "new switch was add to base"
  		 end	
- 		 initialize
+ 		 main_menu
  	end
  	def edit_pass(id)
+ 		begin
  		dev = Info.find(id)
+ 		rescue 
+ 			print "Wrong password"
+ 			print "Press Enter to go Main menu"
+ 			gets
+ 			main_menu
+ 		end
  		system('cls')
  		puts "1) Change title: #{dev["title"]}"
  		puts "2) Change user:  #{dev["user"]}"
- 		puts "3) Change Password: #{dev["password"]}"
+		pass = dev["password"]
  		puts "4) Change Note: #{dev["note"]}"
  		puts "5) Change Link:  #{dev["link"]}"
  		puts "6) Change Temnplate id:  #{dev["template_id"]}"
@@ -75,7 +95,7 @@ class Main
 		  p dev["title"]
 		  print "Enter new Title: "
 		  inp = gets
-		  dev["title"]=inp.strip
+		  dev["title"]=inp.strip.downcase
 		  if dev.save
  		 	p "title was change"
  		 end
@@ -95,7 +115,7 @@ class Main
 		  p dev["password"]
 		  print "Enter new Password: "
 		  inp = gets
-		  dev["password"]=inp.strip
+		  dev["password"]= inp.strip
 		  if dev.save
  		 	p "Password was change"
  		 end	
@@ -113,7 +133,7 @@ class Main
  		elsif inp == "5\n"
 		  system('cls')
 		  p dev["link"]
-		  print "Enter new IP: "
+		  print "Enter new Link: "
 		  inp = gets
 		  dev["link"]=inp.strip
 		  if dev.save
@@ -147,11 +167,11 @@ class Main
  		 end	
  		 edit_pass(id)
 		elsif inp == "0\n"
-			initialize
+			main_menu
 		else
 			print "try again"
 		end	
- 		initialize
+ 		main_menu
  	end	
  	def open_link(templ,link,pass)
  		system('cls') 	
@@ -161,23 +181,22 @@ class Main
 				zte(link,pass)
 			else
 				print "don't know how open link"
-				initialize				
-			end	
- 	
+				main_menu				
+			end	 	
 	end
 	def zte(ip,pass)
 		f = File.new("tmp/#{ip}.lua","w")
 		f.puts ('lua_senddata("admin",true);lua_senddata("'"#{pass}"'",true);lua_start_trace();while true do res,value = lua_getdata();if string.match(value,">") then lua_reset_trace();lua_senddata("en",true);lua_senddata("'"#{pass}"'",true);break;end end')
 		f.close
 		system('putty.exe -telnet '"#{ip}"' -runlua tmp/'"#{ip}"'.lua')
-		initialize
+		main_menu
 	end
  	def zyxel(ip,pass)
  		#ready module, to autorisation on zyxel switch
  		driver = Selenium::WebDriver.for :firefox
  		
 		driver.get "http://admin:#{pass}@#{ip}"
-		initialize
+		main_menu
 	end
  	def show_pass
  		system('cls')
@@ -185,7 +204,7 @@ class Main
 		puts "1) by id"
 		puts "2) by title"
 		puts "3) by link"
-		puts "4) exit"
+		puts "4) To main page"
 		inp = gets
 		puts inp
 		if inp == "1\n"
@@ -195,60 +214,94 @@ class Main
 		elsif inp == "3\n"
 			find_link
 		elsif inp == "4\n"
-			initialize
+			main_menu
 		else
 			print "try again"
 		end	
   	end
   	def show_id(id)
-  		dev = Info.find(id)
- 		system('cls')
- 		p dev
- 		puts "Choose action "
-		puts "1) open"
-		puts "2) edit pass"
-		puts "3) back"
- 		inp = gets
-		puts inp
-		if inp == "1\n"
-			open_link(dev["template_id"],dev["link"],dev["password"])
-		elsif inp == "2\n"
-			edit_pass(id)
-		elsif inp == "3\n"
-			show_pass
-		else
-  		end	
+  			
+  		begin
+  			begin
+ 				dev = Info.find(id)
+ 			rescue ActiveRecord::RecordNotFound
+ 			print "Wrong ID "
+        	puts
+        	puts "Press Enter to return find menu"
+        	gets
+        	show_pass
+ 			end	
+ 		rescue 
+ 			print "Wrong password"
+ 			puts
+ 			puts "Press Enter to go Main menu"
+ 			gets
+ 			main_menu
+ 		end
+ 			begin
+  				temp = Template.find(dev["template_id"])
+  				group = Group.find(dev["group_id"])
+
+ 			system('cls')
+ 			puts "id -> #{dev["id"]}             Title -> #{dev["title"]}"
+ 	 		puts "login -> #{dev["user"]}      pass -> #{dev["password"]}"
+ 			puts ""
+ 			puts "note -> #{dev["note"]}  "
+ 			puts "IP -> #{dev["link"]}  "
+ 			puts ""
+ 			puts "Template -> #{temp["name"]}   Group -> #{group["name"]}"
+ 			puts ""
+ 			puts "Choose action : "
+			puts "1) open"
+			puts "2) edit pass"
+			puts "3) back"
+			rescue
+  			end
+ 			inp = gets
+			puts inp
+			if inp == "1\n"
+				open_link(dev["template_id"],dev["link"],dev["password"])
+			elsif inp == "2\n"
+				edit_pass(id)
+			elsif inp == "3\n"
+				show_pass
+			else
+  			end	
+  		
   	end
   	def find_id
   		system('cls')
   		puts "Enter id:  "
  		id = gets
- 		begin
- 		 show_id(id.strip)
-  		rescue
-  			find_title
-  			print "wrong id"
-  		end
+ 	   
+            show_id(id.strip)
+        
+        
+        
   	end	
   	def find_title
 
   		system('cls')
   		puts "Enter title, or part of title:  "
- 		tit = gets
+ 		tit = gets.downcase
  		dev = Info.find_by_sql("SELECT infos.* FROM infos WHERE infos.title LIKE '%#{tit.strip}%'")
  		system('cls')
+ 		if dev.empty?.!
  		puts "Choose id of switch "
  		dev.each do |dev|
  		 	p "#{dev.id} -> #{dev.title}"
  		 end	
  		 id = gets
- 		begin
- 		 show_id(id.strip)
-  		rescue
-  			find_title
-  			print "wrong id"
-  		end
-  	
+ 	  begin
+           show_id(id.strip)
+         rescue
+            find_title
+            print "wrong id"
+         end
+     else 
+     	print "Try again"
+     	find_title
+     end
   	end
   	def find_link
   		system('cls')
@@ -256,6 +309,7 @@ class Main
  		tit = gets
  		dev = Info.find_by_sql("SELECT infos.* FROM infos WHERE infos.link LIKE '%#{tit.strip}%'")
  		system('cls')
+ 		if dev.empty?.!
  		puts "Choose id of switch "
  		dev.each do |dev| 		 	
  			p "#{dev.id} -> #{dev.title}  -> #{dev.link}"
@@ -267,6 +321,10 @@ class Main
   			find_title
   			print "wrong id"
   		end
+  		 else 
+     	print "Try again"
+     	find_link
+     end
   	end
 
 end
