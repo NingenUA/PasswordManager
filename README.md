@@ -1,4 +1,4 @@
-PasswordManager
+PasswordManager for Windows
 ===============
 
 PasswordManager
