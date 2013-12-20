@@ -23,8 +23,11 @@ Installation
 ========================================
 
 1) bundle install
+
 2) rake db:migrate VERSION=3   #or 1, 2 and 3
+
 3) ruby  after_migration_run_this.rb   # to add template (Zyxel and Zte) and GROUP
+
 4) ruby run_me.rb -> to start
 
 
